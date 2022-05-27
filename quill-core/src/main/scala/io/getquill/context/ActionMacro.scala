@@ -128,8 +128,8 @@ class ActionMacro(val c: MacroContext)
           case q"($param) => $value" =>
             val nestedLift =
               lift match {
-                case ScalarQueryLift(name, batch: Tree, encoder: Tree, quat) =>
-                  ScalarValueLift("value", value, encoder, quat)
+                case ScalarQueryLift(name, batch: Tree, encoder: Tree, uuid, quat) =>
+                  ScalarValueLift("value", value, encoder, uuid, quat)
                 case CaseClassQueryLift(name, batch: Tree, quat) =>
                   CaseClassValueLift("value", value, quat)
               }

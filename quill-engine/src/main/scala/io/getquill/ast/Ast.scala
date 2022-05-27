@@ -4,6 +4,8 @@ import io.getquill.NamingStrategy
 import io.getquill.quat.Quat
 import io.getquill.util.Messages
 
+import java.util.UUID
+
 //************************************************************
 
 sealed trait Ast {
@@ -723,37 +725,42 @@ sealed trait Lift extends External with Terminal {
 
 sealed trait ScalarLift extends Lift with Terminal {
   val encoder: Any
+  val uuid: String
 }
 
-final class ScalarValueLift(val name: String, val value: Any, val encoder: Any)(theQuat: => Quat)
+object ScalarLift {
+  def generateUuid(): String = UUID.randomUUID().toString
+}
+
+final class ScalarValueLift(val name: String, val value: Any, val encoder: Any, val uuid: String)(theQuat: => Quat)
   extends ScalarLift {
   def quat: Quat = theQuat
   def bestQuat = quat
   override def withQuat(quat: => Quat) = this.copy(quat = quat)
 
-  private val id = ScalarValueLift.Id(name, value, encoder)
+  private val id = ScalarValueLift.Id(name, value, encoder, uuid)
   override def hashCode(): Int = id.hashCode()
   override def equals(obj: Any): Boolean =
     obj match {
       case e: ScalarValueLift => e.id == this.id
       case _                  => false
     }
-  def copy(name: String = this.name, value: Any = this.value, encoder: Any = this.encoder, quat: => Quat = this.quat) =
-    ScalarValueLift(name, value, encoder, quat)
+  def copy(name: String = this.name, value: Any = this.value, encoder: Any = this.encoder, uuid: String = this.uuid, quat: => Quat = this.quat) =
+    ScalarValueLift(name, value, encoder, uuid, quat)
 }
 object ScalarValueLift {
-  private case class Id(name: String, value: Any, encoder: Any)
-  def apply(name: String, value: Any, encoder: Any, quat: => Quat): ScalarValueLift = new ScalarValueLift(name, value, encoder)(quat)
-  def unapply(svl: ScalarValueLift) = Some((svl.name, svl.value, svl.encoder, svl.quat))
+  private case class Id(name: String, value: Any, encoder: Any, uuid: String)
+  def apply(name: String, value: Any, encoder: Any, uuid: String, quat: => Quat): ScalarValueLift = new ScalarValueLift(name, value, encoder, uuid)(quat)
+  def unapply(svl: ScalarValueLift) = Some((svl.name, svl.value, svl.encoder, svl.uuid, svl.quat))
 }
 
-final class ScalarQueryLift(val name: String, val value: Any, val encoder: Any)(theQuat: => Quat)
+final class ScalarQueryLift(val name: String, val value: Any, val encoder: Any, val uuid: String)(theQuat: => Quat)
   extends ScalarLift {
   def quat: Quat = theQuat
   def bestQuat = quat
   override def withQuat(quat: => Quat) = this.copy(quat = quat)
 
-  private val id = ScalarQueryLift.Id(name, value, encoder)
+  private val id = ScalarQueryLift.Id(name, value, encoder, uuid)
   override def hashCode(): Int = id.hashCode()
   override def equals(obj: Any): Boolean =
     obj match {
@@ -761,13 +768,13 @@ final class ScalarQueryLift(val name: String, val value: Any, val encoder: Any)(
       case _                  => false
     }
 
-  def copy(name: String = this.name, value: Any = this.value, encoder: Any = this.encoder, quat: => Quat = this.quat) =
-    ScalarQueryLift(name, value, encoder, quat)
+  def copy(name: String = this.name, value: Any = this.value, encoder: Any = this.encoder, uuid: String = this.uuid, quat: => Quat = this.quat) =
+    ScalarQueryLift(name, value, encoder, uuid, quat)
 }
 object ScalarQueryLift {
-  private case class Id(name: String, value: Any, encoder: Any)
-  def apply(name: String, value: Any, encoder: Any, quat: => Quat): ScalarQueryLift = new ScalarQueryLift(name, value, encoder)(quat)
-  def unapply(l: ScalarQueryLift) = Some((l.name, l.value, l.encoder, l.quat))
+  private case class Id(name: String, value: Any, encoder: Any, uuid: String)
+  def apply(name: String, value: Any, encoder: Any, uuid: String, quat: => Quat): ScalarQueryLift = new ScalarQueryLift(name, value, encoder, uuid)(quat)
+  def unapply(l: ScalarQueryLift) = Some((l.name, l.value, l.encoder, l.uuid, l.quat))
 }
 
 sealed trait CaseClassLift extends Lift

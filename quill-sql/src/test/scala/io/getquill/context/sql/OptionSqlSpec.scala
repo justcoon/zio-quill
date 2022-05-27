@@ -19,6 +19,13 @@ class OptionSqlSpec extends Spec {
       }.string mustEqual
         "SELECT s.name FROM Someone s WHERE s.name = 'Joe'"
     }
+    "equal" in {
+      val n: Option[String] = Some("Joe")
+      testContext.run {
+        query[Someone].filter(s => s.name == lift(n))
+      }.string mustEqual // FIXME should not be value substituted ?
+        "SELECT s.name FROM Someone s WHERE s.name IS NULL AND ? IS NULL OR s.name IS NOT NULL AND ? IS NOT NULL AND s.name = ?"
+    }
     "map" in {
       testContext.run {
         query[Someone].map(s => s.name.map(n => n + " Bloggs"))

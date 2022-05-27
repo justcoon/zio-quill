@@ -423,8 +423,10 @@ class QuotationSpec extends Spec {
           val q = quote {
             liftQuery(list).foreach(i => delete(i))
           }
-          quote(unquote(q)).ast mustEqual
-            Foreach(ScalarQueryLift("q.list", list, intEncoder, QV), Ident("i"), delete.ast.body)
+          val b = delete.ast.body
+          quote(unquote(q)).ast must matchPattern {
+            case Foreach(ScalarQueryLift("q.list", list, intEncoder, _, QV), Ident("i", Quat.Value), b) =>
+          }
         }
         "batch with Quoted[Action[T]]" in {
           val list = List(

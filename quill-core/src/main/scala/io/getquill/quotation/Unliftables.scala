@@ -203,10 +203,10 @@ trait Unliftables extends QuatUnliftable {
   }
 
   implicit val liftUnliftable: Unliftable[Lift] = Unliftable[Lift] {
-    case q"$pack.ScalarValueLift.apply(${ a: String }, $b, $c, ${ quat: Quat })" => ScalarValueLift(a, b, c, quat)
-    case q"$pack.CaseClassValueLift.apply(${ a: String }, $b, ${ quat: Quat })"  => CaseClassValueLift(a, b, quat)
-    case q"$pack.ScalarQueryLift.apply(${ a: String }, $b, $c, ${ quat: Quat })" => ScalarQueryLift(a, b, c, quat)
-    case q"$pack.CaseClassQueryLift.apply(${ a: String }, $b, ${ quat: Quat })"  => CaseClassQueryLift(a, b, quat)
+    case q"$pack.ScalarValueLift.apply(${ a: String }, $b, $c, ${ u: String }, ${ quat: Quat })" => ScalarValueLift(a, b, c, u, quat)
+    case q"$pack.CaseClassValueLift.apply(${ a: String }, $b, ${ quat: Quat })"                  => CaseClassValueLift(a, b, quat)
+    case q"$pack.ScalarQueryLift.apply(${ a: String }, $b, $c, ${ u: String }, ${ quat: Quat })" => ScalarQueryLift(a, b, c, u, quat)
+    case q"$pack.CaseClassQueryLift.apply(${ a: String }, $b, ${ quat: Quat })"                  => CaseClassQueryLift(a, b, quat)
   }
   implicit val tagUnliftable: Unliftable[Tag] = Unliftable[Tag] {
     case q"$pack.ScalarTag.apply(${ uid: String })"    => ScalarTag(uid)

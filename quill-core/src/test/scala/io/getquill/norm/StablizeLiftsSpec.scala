@@ -17,7 +17,7 @@ class StablizeLiftsSpec extends Spec {
       val astQuat = quatOf[Int]
       val (stablized, state) = StablizeLifts.stablize(ast)
       stablized must matchPattern {
-        case ScalarValueLift("scalarValue", StablizeLifts.Token(0), _, `astQuat`) =>
+        case ScalarValueLift("scalarValue", StablizeLifts.Token(0), _, _, `astQuat`) =>
       }
       state.replaceTable mustEqual (IMap(StablizeLifts.Token(0) -> scalarValue))
       StablizeLifts.revert(stablized, state) mustEqual (ast)
@@ -28,7 +28,7 @@ class StablizeLiftsSpec extends Spec {
       val astQuat = ast.quat
       val (stablized, state) = StablizeLifts.stablize(ast)
       stablized must matchPattern {
-        case ScalarQueryLift("scalarQuery", StablizeLifts.Token(0), _, `astQuat`) =>
+        case ScalarQueryLift("scalarQuery", StablizeLifts.Token(0), _, _, `astQuat`) =>
       }
       StablizeLifts.revert(stablized, state) mustEqual (ast)
     }
@@ -66,8 +66,8 @@ class StablizeLiftsSpec extends Spec {
       val (stablized, state) = StablizeLifts.stablize(ast)
       stablized must matchPattern {
         case BinaryOperation(
-          ScalarValueLift("a", StablizeLifts.Token(0), _, `quatA`),
-          StringOperator.`+`, ScalarValueLift("b", StablizeLifts.Token(1), _, `quatB`)) =>
+          ScalarValueLift("a", StablizeLifts.Token(0), _, _, `quatA`),
+          StringOperator.`+`, ScalarValueLift("b", StablizeLifts.Token(1), _, _, `quatB`)) =>
       }
       val expectedTable = IMap(StablizeLifts.Token(0) -> a, StablizeLifts.Token(1) -> b)
       state.replaceTable must contain theSameElementsAs (expectedTable)
